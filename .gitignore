@@ -11,6 +11,9 @@ target/
 # Python
 *.pyc
 
+# Pickle files
+*.pkl
+
 # nohup
 nohup.out
 
