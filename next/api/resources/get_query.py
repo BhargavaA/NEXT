@@ -3,7 +3,7 @@ next_backend Query Resource
 Query resource for handling restful querying of experiments in next_backend. 
 """
 
-from flask.ext.restful import Resource, reqparse
+from flask_restful import Resource, reqparse
 
 import json
 import next.utils
@@ -52,7 +52,8 @@ class getQuery(Resource):
         app_id = resource_manager.get_app_id(exp_uid)
         # Standardized participant_uid
         if 'participant_uid' in args_data['args'].keys():
-            args_data['args']['participant_uid'] = exp_uid+"_"+args_data['args']['participant_uid']
+            args_data['args']['participant_uid'] = exp_uid+"_" + \
+                                str(args_data['args']['participant_uid'])
 
         render_widget = args_data['args'].get('widget',False)
 
@@ -63,7 +64,7 @@ class getQuery(Resource):
             return attach_meta({},meta_error['QueryGenerationError'], backend_error=message)
 
         if render_widget:
-            TEMPLATES_DIRECTORY = 'next/apps/Apps/{}/widgets'.format(resource_manager.get_app_id(exp_uid))
+            TEMPLATES_DIRECTORY = 'apps/{}/widgets'.format(resource_manager.get_app_id(exp_uid))
             env = Environment(loader=FileSystemLoader(TEMPLATES_DIRECTORY))
             template=env.get_template("getQuery_widget.html")
             return {'html':template.render(query=response_dict), 'args':response_dict}, 200, {'Access-Control-Allow-Origin':'*', 'Content-Type':'application/json'}

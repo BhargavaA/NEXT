@@ -4,13 +4,18 @@ MAINTAINER Lalit Jain, lalitkumarj@gmail.com
 RUN apt-get update && apt-get install -y \
     python \
     python-dev \
-    python-distribute \ 
+    python-distribute \
     python-pip \
     python-numpy \
     python-scipy \
     python-gevent \
-    python-matplotlib \ 
-    numactl 
+    python-pandas \
+    python-matplotlib \
+    python-ply \
+    numactl
+
+# Put in place because ran into bug with pip (!)
+RUN python -m pip install -U pip
 
 # Install MongoDB and its tools
 RUN \

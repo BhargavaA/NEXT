@@ -1,10 +1,9 @@
 from flask import Flask
-from flask.ext import restful
-from flask.ext.restful import Resource, reqparse, request
+from flask_restful import Resource, reqparse, request
 
 import json
 import random
-from next.utils import utils
+import next.utils as utils
 import next.broker.broker
 from next.api.resource_manager import ResourceManager
 from next.api.api_util import *
@@ -55,7 +54,7 @@ class Experiment(Resource):
             return attach_meta(experiment, meta_success), 200
 
     def post(self):
-        print('experiment:58',request.data)
+        utils.debug_print('experiment:58',request.data)
         post_parser = exp_parser.copy()
         post_parser.add_argument('app_id', type=str, required=True)
         post_parser.add_argument('args', type=dict, required=True)
@@ -63,7 +62,7 @@ class Experiment(Resource):
         args_data = post_parser.parse_args()
         utils.debug_print(args_data)
         app_id = args_data['app_id']
-        print app_id
+        utils.debug_print(app_id)
         # Create and set exp_uid
         exp_uid = '%030x' % random.randrange(16**30)
         # Args from dict to json type

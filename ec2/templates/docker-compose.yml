@@ -16,11 +16,13 @@ cadvisor:
 
 
 ######## MINION MACHINE #########
-# minionredis:
-#   image: redis
-#   command: redis-server /database/next/database/CacheStore/redis.conf
-#   volumes:
-#    - next_backend:/database 
+minionredis:
+  image: redis
+  command: redis-server /next_backend/next/database_client/CacheStore/redis.conf
+  volumes:
+   - .:/next_backend 
+  expose:
+   - "6379"
 
 minionworker:
   build: next/base_docker_image
@@ -32,15 +34,17 @@ minionworker:
     - mongodb:MONGODB  
     - rabbitmq:RABBIT
     - rabbitmqredis:RABBITREDIS
+    - minionredis:MINIONREDIS 
   environment:
    - PYTHONUNBUFFERED=TRUE
    - CELERY_SYNC_WORKER_COUNT={{CELERY_SYNC_WORKER_COUNT}}
    - CELERY_ASYNC_WORKER_COUNT={{CELERY_ASYNC_WORKER_COUNT}}
    - CELERY_THREADS_PER_ASYNC_WORKER={{CELERY_THREADS_PER_ASYNC_WORKER}}
    - CELERY_ASYNC_WORKER_PREFETCH={{CELERY_ASYNC_WORKER_PREFETCH}}
-   - CELERY_DASHBOARD_WORKER_COUNT={{CELERY_ASYNC_WORKER_COUNT}}
-   - CELERY_THREADS_PER_DASHBOARD_WORKER={{CELERY_THREADS_PER_ASYNC_WORKER}}
-   - CELERY_DASHBOARD_WORKER_PREFETCH={{CELERY_ASYNC_WORKER_PREFETCH}}
+   - CELERY_DASHBOARD_WORKER_COUNT={{CELERY_DASHBOARD_WORKER_COUNT}}
+   - CELERY_THREADS_PER_DASHBOARD_WORKER={{CELERY_THREADS_PER_DASHBOARD_WORKER}}
+   - CELERY_DASHBOARD_WORKER_PREFETCH={{CELERY_DASHBOARD_WORKER_PREFETCH}}
+   - SITE_KEY
    - GIT_HASH={{GIT_HASH}}
    - PYTHONPATH=:/next_backend
 ####################################
@@ -49,7 +53,7 @@ minionworker:
 ######### API #########
 nextbackenddocker:
   build: next/base_docker_image
-  command: gunicorn  --worker-class=gevent -R --log-level=debug --logger-class=simple --reload -b 0.0.0.0:8000 -w {{NEXT_BACKEND_NUM_GUNICORN_WORKERS}} next.api.api:app
+  command: gunicorn  --reload --worker-class=gevent -R --log-level=debug --logger-class=simple --max-requests={{NEXT_BACKEND_GUNICORN_WORKER_MAX_REQUESTS}} -b 0.0.0.0:8000 -w {{NEXT_BACKEND_NUM_GUNICORN_WORKERS}} next.api.api:app
   volumes:
    - .:/next_backend
   working_dir: /next_backend
@@ -67,6 +71,7 @@ nextbackenddocker:
    # global url for dashboards on backend
    - NEXT_BACKEND_GLOBAL_HOST
    - NEXT_BACKEND_GLOBAL_PORT
+   - SITE_KEY
    - GIT_HASH={{GIT_HASH}}
    - TERM=xterm
    - CELERY_ON={{CELERY_ON}}
