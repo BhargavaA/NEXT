@@ -24,6 +24,7 @@ RUN \
   rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies for next_backend
+RUN pip install -U setuptools
 RUN pip install ipdb==0.10.2
 RUN pip install line_profiler==2.0
 RUN pip install celery==3.1.25
