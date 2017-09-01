@@ -7,25 +7,66 @@ import time
 import json
 import traceback
 import numpy
-from next.constants import DEBUG_ON
 import hashlib
 
-# import next.logging_client.LoggerHTTP as ell
-from next.database_client.DatabaseAPI import DatabaseAPI
-db = DatabaseAPI()
-from next.logging_client.LoggerAPI import LoggerAPI
-ell = LoggerAPI()
 import next.utils
 import next.constants
-import next.apps.Butler as Butler
+from next.constants import DEBUG_ON
+
+from next.database_client.DatabaseAPI import DatabaseAPI, DatabaseException
+from next.logging_client.LoggerAPI import LoggerAPI
+
+from next.apps.Butler import Butler
 import next.lib.pijemont.verifier as verifier
 
-from billiard import current_process
+db, ell = None, None
 
+def worker_connect_db():
+    next.utils.debug_print("Initializing worker database connection")
+    backoff_dt = 0.01
+    while True:
+        try:
+            db, ell = DatabaseAPI(), LoggerAPI()
+            break
+        except DatabaseException as e:
+            next.utils.debug_print("Failed to connect to database ({}), retrying in {}s".format(e, backoff_dt))
+            time.sleep(backoff_dt)
+            backoff_dt *= 2
 
-from celery.signals import celeryd_init
+            # If we've tried too many times, make the database failure /loud/.
+            if backoff_dt > 1:
+                raise e
 
-@celeryd_init.connect
+    return db, ell
+
+# if we're not using celery, just initialize the database globally
+if not next.constants.CELERY_ON:
+    db, ell = worker_connect_db()
+
+# runs for each worker process spawned by Celery
+# we initialize the DatabaseAPI per worker here
+@celery.signals.worker_process_init.connect
+def on_connect(**kwargs):
+    global db, ell
+    # make sure every worker has a different random seed
+    # by default `seed` reads from /dev/urandom or seeds from clock
+    # and as of celery 3.1.25, kwargs doesn't contain any unique info per worker
+    numpy.random.seed()
+
+    db, ell = worker_connect_db()
+
+# runs when each Celery worker process shuts down
+# we'll close the database connections here
+@celery.signals.worker_process_shutdown.connect
+def on_shutdown(**kwargs):
+    if db:
+        next.utils.debug_print("Closing worker's database connections")
+        db.close()
+    if ell:
+        next.utils.debug_print("Closing worker's logger connections")
+        ell.close()
+
+@celery.signals.celeryd_init.connect
 def configure_workers(sender=None, conf=None, **kwargs):
     if sender.startswith('Hash_Worker'):
         from next.lib.hash import kjunutils
@@ -46,9 +87,6 @@ def configure_workers(sender=None, conf=None, **kwargs):
         db.X = numpy.load('untagged_features_cpca80_morph.npy')
         next.utils.debug_print('loaded features & stuff...')
 
-
-Butler = Butler.Butler
-
 class App_Wrapper:
         def __init__(self, app_id, exp_uid, db, ell):
                 self.app_id = app_id
@@ -63,9 +101,9 @@ class App_Wrapper:
                 meta = args_out_dict.get('meta',{})
                 if 'log_entry_durations' in meta.keys():
                         self.log_entry_durations = meta['log_entry_durations']
-                        self.log_entry_durations['timestamp'] = next.utils.datetimeNow()                  
+                        self.log_entry_durations['timestamp'] = next.utils.datetimeNow()
                 return args_out_dict['args']
-                
+
 # Main application task
 def apply(app_id, exp_uid, task_name, args_in_json, enqueue_timestamp):
 	enqueue_datetime = next.utils.str2datetime(enqueue_timestamp)
@@ -120,7 +158,7 @@ def apply_dashboard(app_id, exp_uid, args_in_json, enqueue_timestamp):
         app = App_Wrapper(app_id, exp_uid, db, ell)
         cached_doc = app.butler.dashboard.get(uid=stat_uid)
         cached_response = None
-        if (int(stat_args.get('force_recompute',0))==0) and (cached_doc is not None):    
+        if (int(stat_args.get('force_recompute',0))==0) and (cached_doc is not None):
           delta_datetime = (next.utils.datetimeNow() - next.utils.str2datetime(cached_doc['timestamp']))
           if delta_datetime.seconds < next.constants.DASHBOARD_STALENESS_IN_SECONDS:
             cached_response = json.loads(cached_doc['data_dict'])
@@ -139,7 +177,7 @@ def apply_dashboard(app_id, exp_uid, args_in_json, enqueue_timestamp):
             dashboard = dashboard(db, ell)
             stats_method = getattr(dashboard, stat_id)
             response,dt = next.utils.timeit(stats_method)(app,app.butler,**args_dict['args']['params'])
-            
+
             save_dict = {'exp_uid':app.exp_uid,
                     'stat_uid':stat_uid,
                     'timestamp':next.utils.datetime2str(next.utils.datetimeNow()),
@@ -159,7 +197,7 @@ def apply_dashboard(app_id, exp_uid, args_in_json, enqueue_timestamp):
 	return json.dumps(response), True, ''
 
 
-def apply_sync_by_namespace(app_id, exp_uid, alg_id, alg_label, task_name, args, namespace, job_uid, enqueue_timestamp, time_limit):	
+def apply_sync_by_namespace(app_id, exp_uid, alg_id, alg_label, task_name, args, namespace, job_uid, enqueue_timestamp, time_limit):
 	enqueue_datetime = next.utils.str2datetime(enqueue_timestamp)
 	dequeue_datetime = next.utils.datetimeNow()
 	delta_datetime = dequeue_datetime - enqueue_datetime
@@ -180,28 +218,19 @@ def apply_sync_by_namespace(app_id, exp_uid, alg_id, alg_label, task_name, args,
                 log_entry_durations['timestamp'] = next.utils.datetimeNow()
                 ell.log( app_id+':ALG-DURATION', log_entry_durations)
 		print '########## Finished namespace:%s,  job_uid=%s,  time_enqueued=%s,  execution_time=%s ##########' % (namespace,job_uid,time_enqueued,dt)
-		return 
+		return
 	except Exception, error:
 		exc_type, exc_value, exc_traceback = sys.exc_info()
                 print "tasks Exception: {} {}".format(error, traceback.format_exc())
-                traceback.print_tb(exc_traceback)           
- 
+                traceback.print_tb(exc_traceback)
+
 		# error = traceback.format_exc()
-		# log_entry = { 'exp_uid':exp_uid,'task':'daemonProcess','error':error,'timestamp':next.utils.datetimeNow() } 
+		# log_entry = { 'exp_uid':exp_uid,'task':'daemonProcess','error':error,'timestamp':next.utils.datetimeNow() }
 		# ell.log( app_id+':APP-EXCEPTION', log_entry  )
 		return None
-
-# forces each worker to get its own random seed. 
-@celery.signals.worker_process_init.connect()
-def seed_rng(**_):
-    """
-    Seeds the numpy random number generator.
-    """
-    numpy.random.seed()
 
 # If celery isn't off, celery-wrap the functions so they can be called with apply_async
 if next.constants.CELERY_ON:
         apply = app.task(apply)
         apply_dashboard = app.task(apply_dashboard)
         apply_sync_by_namespace = app.task(apply_sync_by_namespace)
-
