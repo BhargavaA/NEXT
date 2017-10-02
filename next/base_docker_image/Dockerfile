@@ -1,21 +1,5 @@
-FROM ubuntu:14.04
+FROM python:2
 MAINTAINER Lalit Jain, lalitkumarj@gmail.com
-# Install basic applications
-RUN apt-get update && apt-get install -y \
-    python \
-    python-dev \
-    python-distribute \
-    python-pip \
-    python-numpy \
-    python-scipy \
-    python-gevent \
-    python-pandas \
-    python-matplotlib \
-    python-ply \
-    numactl
-
-# Put in place because ran into bug with pip (!)
-RUN python -m pip install -U pip
 
 # Install MongoDB and its tools
 RUN \
@@ -28,4 +12,3 @@ RUN \
 # Install python dependencies for next_backend
 ADD requirements.txt /requirements.txt
 RUN pip install -U -r requirements.txt
-

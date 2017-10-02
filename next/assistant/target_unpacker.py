@@ -6,6 +6,7 @@ from StringIO import StringIO
 import base64
 import random
 import sys
+import json
 
 if __name__ == "__main__":
     sys.path.append('../..')
@@ -44,18 +45,24 @@ def upload_target(filename, file_obj, bucket_name, aws_key, aws_secret_key,
     else:
         bucket = s3.create_bucket(bucket_name, aws_key, aws_secret_key)
 
-    utils.debug_print('begin ' + filename)
+    utils.debug_print('Uploading target: {}'.format(filename))
     url = s3.upload(filename,  StringIO(file_obj), bucket)
     target_types = {'png': 'image', 'jpeg': 'image', 'jpg': 'image',
                     'mp4': 'movie', 'mov': 'movie',
-                    'txt': 'text'}
-    utils.debug_print('end ' + filename)
+                    'txt': 'text', 'csv': 'text'}
+    utils.debug_print('Done uploading target: {}'.format(filename))
 
     return {'target_id': str(i),
             'primary_type': target_types[filename.split('.')[-1]],
             'primary_description': url,
             'alt_type': 'text',
             'alt_description': filename}
+
+def get_filenames_from_zip(s):
+    base64_zip = io.BytesIO(s)
+    zip_file = zipfile.ZipFile(base64_zip)
+    return zip_file.namelist()
+
 
 def unpack(s, aws_key, aws_secret_key, bucket_name, n_jobs=None,
            get_bucket=True):
@@ -72,7 +79,7 @@ def unpack(s, aws_key, aws_secret_key, bucket_name, n_jobs=None,
     # TODO: trim here for JSON object to append to dictionaries
     # TODO: manage CSV targets here
     # TODO: how come creating a S3 bucket isn't working for me?
-    utils.debug_print('Beginning to upload targets')
+    utils.debug_print('=== Starting upload of targets to S3 ===')
     try:
         targets = Parallel(n_jobs=n_jobs, backend='threading') \
                     (delayed(upload_target, check_pickle=False)
@@ -80,30 +87,34 @@ def unpack(s, aws_key, aws_secret_key, bucket_name, n_jobs=None,
                                i=i, get_bucket=True)
                    for i, (name, file) in enumerate(files.items()))
     except:
-        utils.debug_print('Whoops, parallel upload failed. '
-                          'Trying with {} threads'.format(n_jobs))
+        utils.debug_print('Whoops, parallel S3 upload failed. Trying serially.')
         targets = [upload_target(name, file, bucket_name, aws_key, aws_secret_key,
                                  i=i, get_bucket=True)
                    for i, (name, file) in enumerate(files.items())]
     return targets
 
 
-def unpack_csv_file(s):
+def unpack_text_file(s, kind='csv'):
+    kind = kind.lower()  # always lower case extension
     base64_zip = io.BytesIO(s)
     zip_file = zipfile.ZipFile(base64_zip)
     files = zipfile_to_dictionary(zip_file)
-    # assuming len(files) == 1 and files[0][-3:] == 'csv'
-    # if len(files) > 1 or files.keys()[0][-3:] not in {'csv', 'txt'}:
-        # raise ValueError('Only one TXT/CSV file supported in the ZIP file')
 
-    strings = files[files.keys()[0]].split('\n')
-    targets = [{'target_id': str(i),
-                'primary_type': 'text',
-                'primary_description': string,
-                'alt_type': 'text',
-                'alt_description': string}
-               for i, string in enumerate(strings[:-1])]  # -1 because last newline
-    return targets
+    # files is has at least one key; (tested before call in assistant_blueprint.py)
+    file_str = files[files.keys()[0]]
+    if kind in {'csv', 'txt'}:
+        strings = file_str.split('\n')[:-1]  # -1 because last newline
+        targets = [{'target_id': str(i),
+                    'primary_type': 'text',
+                    'primary_description': string,
+                    'alt_type': 'text',
+                    'alt_description': string}
+                   for i, string in enumerate(strings)]
+        return targets
+    elif kind in {'json'}:
+        return json.loads(file_str)
+    else:
+        raise ValueError('`kind` not regonized in `unpack_text_file`')
 
 
 if __name__ == "__main__":

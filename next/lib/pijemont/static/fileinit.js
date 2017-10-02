@@ -32,7 +32,7 @@ function serialise(data){
     ans = "";
     payload = "";
     for(var x in data){
-	if(data[x] == null || data[x] == "") continue; 
+	if(data[x] == null || data[x] == "") continue;
 	ans += x + ":" + data[x].length + ";";
 	payload += data[x]
     }
@@ -51,14 +51,6 @@ function submit_form(){
     for(var i = 0; i < saved_params.length; i++){
 	document.cookie = saved_params[i] + ' = ' + document.getElementById(saved_params[i]).value.trim() + '; ';
     }
-    if(data['targets'] != null && data['targets'] != ""){
-	for(var i = 0; i < params.length; i++){
-	    if(data[params[i]].length == 0){
-		alert("Please enter "+params[i]);
-		return;
-	    }
-	}
-    }
     console.log(data);
     var XHR = new XMLHttpRequest();
     XHR.addEventListener("load", function(event) {
@@ -68,7 +60,7 @@ function submit_form(){
 	    document.getElementById('exp_status').innerHTML = "Success!  <br /><a target=\"_blank\" href=\"/dashboard/experiment_dashboard/"+ret.exp_uid+"/"+ret.app_id+"\">Experiment dashboard</a><br /><a target=\"_blank\" href=\"/query/query_page/query_page/"+ret.exp_uid+"\">Experiment query page</a>";
 	}
 	else{
-	    document.getElementById('exp_status').innerHTML = "There was an error:  <br /><font color=\"red\"><pre>"+ret.message+"</pre></font>";
+	    document.getElementById('exp_status').innerHTML = "There was an error:  <br /><pre style=\"color:red;\">"+ret.message+"</pre>";
 	    document.getElementById('initExp').disabled = false;
 	}
     });
