@@ -1,5 +1,9 @@
 venv/
 
+# Python
+*.npy
+*.pkl
+
 # Mac
 .DS_Store
 
