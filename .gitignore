@@ -3,6 +3,14 @@ venv/
 # Python
 *.npy
 *.pkl
+*.pyc
+
+# YAML
+*.yml-e
+
+# Data files
+*.json
+*.csv
 
 # Mac
 .DS_Store
@@ -13,9 +21,6 @@ target/
 
 # Emacs
 *~
-
-# Python
-*.pyc
 
 # Pickle files
 *.pkl
