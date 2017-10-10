@@ -5,6 +5,10 @@ venv/
 *.pkl
 *.pyc
 
+# Misc
+ec3/
+examples/strange_fruit_triplet/strangefruit30/
+
 # YAML
 *.yml-e
 
