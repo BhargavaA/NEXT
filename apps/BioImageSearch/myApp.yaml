@@ -23,33 +23,8 @@ initExp:
         n:
           description: Number of arms.
           type: num
-        R:
-          description: Sub-gaussian parameter of the noise.
-          optional: true
-          default: 1.0
-          type: num
         failure_probability:
           description: Confidence value of result.
-          type: num
-        S:
-          description: Upper bound on the norm of theta*.
-          optional: true
-          default: 1.0
-          type: num
-        L:
-          description: Upper bound on the norm of the arms.
-          optional: true
-          default: 1.0
-          type: num
-        c:
-          description: Radius constant, set to 1. for theoretically guaranteed algorithm. 0. <= c < 1 works in some cases but doesn't have theoretical guarantees.
-          optional: true
-          default: 1.0
-          type: num
-        epsilon:
-          description: Parameter for the epsilon-greedy algorithm.
-          optional: true
-          default: 0.1
           type: num
 
 

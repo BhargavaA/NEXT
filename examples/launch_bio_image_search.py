@@ -47,13 +47,25 @@ def launch(targets_filename=None, upload=False):
 
     supported_alg_ids = ['RandomSampling']
 
-
     alg_list = []
     for alg_id in supported_alg_ids:
         alg_item = {}
         alg_item['alg_id'] = alg_id
         alg_item['alg_label'] = alg_id
         alg_item['test_alg_label'] = alg_id
+        if alg_id == 'EpsilonGreedy':
+            alg_item['params'] = {
+                'epsilon': 0.1,
+                'ridge': 1.0
+            }
+        elif alg_id == 'OFUL':
+            alg_item['params'] = {
+                'ridge': 1.0,
+                'R': 1.0,
+                'S': 1.0,
+                'L': 1.0,
+                'c': 1.0
+            }
         # alg_item['params'] = {}
         alg_list.append(alg_item)
 
@@ -76,18 +88,14 @@ def launch(targets_filename=None, upload=False):
         'num_tries': 50,
         'd': d,
         'n': n,
-        'R': 1.0,
-        'S': 1.0,
-        'c': 1.0,
-        'L': 1.0,
-        'epsilon': 0.1
+        'targets': {'targetset': targetset}
     }
-    initExp['args']['targets'] = {'targetset': targetset}
 
     # initExp['args']['R'] = 1.
     # initExp['args']['rating_scale'] = {'labels': [{'label':'yes', 'reward': 1},
     #                                              {'label':'no', 'reward': -1}]}
-
+    # with open('initExp.json', 'w') as f:
+    #     json.dump(initExp, f)
 
     host_url = os.environ.get('NEXT_BACKEND_GLOBAL_HOST', 'localhost')
     host_url = 'http://' + host_url + ':8000'

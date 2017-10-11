@@ -9,9 +9,6 @@ venv/
 ec3/
 examples/strange_fruit_triplet/strangefruit30/
 
-# YAML
-*.yml-e
-
 # Data files
 *.json
 *.csv
