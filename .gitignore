@@ -1,18 +1,5 @@
 venv/
 
-# Python
-*.npy
-*.pkl
-*.pyc
-
-# Misc
-ec3/
-examples/strange_fruit_triplet/strangefruit30/
-
-# Data files
-*.json
-*.csv
-
 # Mac
 .DS_Store
 
@@ -23,8 +10,8 @@ target/
 # Emacs
 *~
 
-# Pickle files
-*.pkl
+# Python
+*.pyc
 
 # nohup
 nohup.out
