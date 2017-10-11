@@ -19,7 +19,7 @@ class MyApp:
         del args['targets']
 
         alg_data = {}
-        algorithm_keys = ['n', 'd','failure_probability', 'R', 'S', 'L', 'c', 'epsilon']
+        algorithm_keys = ['n', 'd','failure_probability']
         for key in algorithm_keys:
             if key in args:
                 alg_data[key] = args[key]

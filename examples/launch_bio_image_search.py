@@ -80,16 +80,25 @@ def launch(targets_filename=None, upload=False):
     # Create experiment dictionary
     initExp = {}
     initExp['app_id'] = 'BioImageSearch'
-    initExp['args'] = {
-        'failure_probability': 0.05,
-        'participant_to_algorithm_management': 'one_to_one',
-        'algorithm_management_settings': algorithm_management_settings,
-        'alg_list': alg_list,
-        'num_tries': 50,
-        'd': d,
-        'n': n,
-        'targets': {'targetset': targetset}
-    }
+    initExp['args'] = {}
+    initExp['args']['failure_probability'] = 0.05
+    initExp['args']['participant_to_algorithm_management'] = 'one_to_one'
+    initExp['args']['algorithm_management_settings'] = algorithm_management_settings
+    initExp['args']['alg_list'] = alg_list
+    initExp['args']['num_tries'] = 50
+    initExp['args']['d'] = d
+    initExp['args']['n'] = n
+    initExp['args']['targets'] = {'targetset': targetset}
+    # initExp['args'] = {
+    #     'failure_probability': 0.05,
+    #     'participant_to_algorithm_management': 'one_to_one',
+    #     'algorithm_management_settings': algorithm_management_settings,
+    #     'alg_list': alg_list,
+    #     'num_tries': 50,
+    #     'd': d,
+    #     'n': n,
+    #     'targets': {'targetset': targetset}
+    # }
 
     # initExp['args']['R'] = 1.
     # initExp['args']['rating_scale'] = {'labels': [{'label':'yes', 'reward': 1},
