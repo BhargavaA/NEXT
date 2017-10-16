@@ -1,6 +1,7 @@
 import json
 import next.utils as utils
 import next.apps.SimpleTargetManager
+import numpy as np
 
 
 class MyApp:
@@ -28,10 +29,51 @@ class MyApp:
         return args
 
     def getQuery(self, butler, alg, args):
-        alg_response = alg()
-        exp_uid = butler.exp_uid
-        next_arm = self.TargetManager.get_target_item(exp_uid, alg_response[0])
-        return {'next_arm': [next_arm]}
+        experiment = butler.experiment.get()
+        n = experiment['args']['n']
+        exp_uid = experiment['exp_uid']
+        participant_uid = args['participant_uid']
+        num_answers = butler.participants.get(uid=participant_uid, key='num_reported_answers')
+        utils.debug_print('num_answers:', num_answers)
+        if num_answers is None:
+            butler.participants.set(uid=participant_uid, key='num_reported_answers', value=0)
+            next_arm = np.random.choice(range(n))
+            utils.debug_print('First arm shown: %d' % next_arm)
+            target = self.TargetManager.get_target_item(exp_uid=exp_uid, target_id=next_arm)
+            targets_list = {
+                'index': next_arm,
+                'target': target,
+                'instructions': 'Pick similar images'
+            }
+            return_dict = {
+                'initial_query': True,
+                'targets': [targets_list],
+                'instructions': 'When ready, please click on the image to start',
+                'target_indices': [target]
+            }
+            butler.experiment.set(key='init_arm', value=next_arm)
+        else:
+            alg_response = alg()
+            exp_uid = butler.exp_uid
+            init_arm = butler.experiment.get(key='init_arm')
+            next_arm = self.TargetManager.get_target_item(exp_uid, alg_response[0])
+            target = self.TargetManager.get_target_item(exp_uid, next_arm)
+            init_target = self.TargetManager.get_target_item(exp_uid, init_arm)
+            targets_list = {
+                'index': next_arm,
+                'target': target
+            }
+            return_dict = {
+                'initial_query': False,
+                'targets': targets_list,
+                'main_target': init_target,
+                'instructions': 'Is this the kind of image you are looking for?',
+                'count': 1,
+                'target_indices': [target]
+            }
+            # return {'next_arm': [next_arm]}
+
+        return return_dict
 
     def processAnswer(self, butler, alg, args):
         query = butler.queries.get(uid=args['query_uid'])

@@ -120,6 +120,8 @@ def launch(targets_filename=None, upload=False):
 
     initExp_response_dict = json.loads(response.text)
     print('initExp_response_dict', initExp_response_dict)
+    print('Experiment link:')
+    print(host_url + '/query/query_page/query_page/' + initExp_response_dict['exp_uid'])
     exp_uid = initExp_response_dict['exp_uid']
 
 if __name__ == "__main__":

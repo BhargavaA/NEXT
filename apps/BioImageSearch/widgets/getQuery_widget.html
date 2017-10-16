@@ -92,7 +92,13 @@ div.option{
 <div class="row" id="center">
   <div class="col-xs-12">
     {% if query.initial_query %}
+        <textarea>
+          "came into inital query"
+        </textarea>
         {% for target in query.targets %}
+        <textarea>
+          "came into loop"
+        </textarea>
         <div class="option"
          id="{{target.index}}"
          onclick="submit_initial({{target.index}})">
@@ -131,7 +137,7 @@ div.option{
         </div>
         {% endfor %}
     {% else %}
-        {% if query.targets[0].target.primary_type == "image" or query.targets[0].target.primary_type == "img" %}
+        {% if query.targets.target.primary_type == "image" or query.targets.target.primary_type == "img" %}
         <div class="image_container">
           <img class="image" src="{{ query.targets[0].target.primary_description }}"> </img>
           <p></p>
@@ -139,8 +145,20 @@ div.option{
         <div id="init_query" style="float:right;">
           Starting image: <br /><img width="50%" height="50%" class="image" src="{{ query.main_target.primary_description }}"> </img>
         </div>
-        {% elif query.targets[0].target.primary_type == "text"%}
+        {% elif query.targets.target.primary_type == "text"%}
         {% endif %}
+    {% endif %}
+  </div>
+</div>
+<div class="row" style="height:50%">
+  <!-- Test-->
+  <div class="col-xs-12" id="center" >
+    {% if query.target_indices[0].primary_type == "image" or query.target_indices[0].primary_type == "img" %}
+    <img class="center-block" src={{ query.target_indices[0].primary_description }}></img>
+    {% elif query.target_indices[0].primary_type == "text" %}
+    <div>
+      <div>{{ query.target_indices }}</div>
+    </div>
     {% endif %}
   </div>
 </div>

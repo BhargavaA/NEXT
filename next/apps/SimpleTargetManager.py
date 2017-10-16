@@ -12,10 +12,13 @@ class SimpleTargetManager(object):
         for i,target in enumerate(targetset):
             target['target_id'] = i
             target['exp_uid'] = exp_uid
-            
+            utils.debug_print('Trying to set target_id:%d' % i)
+            utils.debug_print('Target: ', target)
+
             try:
                 self.db.set_doc(self.bucket_id, None, target)
-            except e:
+                utils.debug_print('Successfully set target_id: %d' % i)
+            except Exception as e:
                 raise Exception("Failed to create_target_mapping: " + str(e))
 
     def get_targetset(self, exp_uid):
@@ -37,7 +40,7 @@ class SimpleTargetManager(object):
             got_target = self.db.get_docs_with_filter(self.bucket_id,
                                                       {'exp_uid': exp_uid,
                                                       'target_id': target_id})
-        except e:
+        except Exception as e:
             raise Exception("Failed to get_target_item: " + str(e))
 
         try:

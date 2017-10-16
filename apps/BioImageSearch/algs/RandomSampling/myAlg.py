@@ -6,7 +6,7 @@ import next.utils as utils
 
 
 class MyAlg:
-  def initExp(self, butler, n, d, failure_probability, R, S, L, C, epsilon):
+  def initExp(self, butler, n, d, failure_probability):
     unasked_arms = range(n)
     expected_rewards = ra.normal(0, 1, n)
     received_rewards = []
