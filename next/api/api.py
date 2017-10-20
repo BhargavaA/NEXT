@@ -7,6 +7,7 @@ import next.constants as constants
 
 from flask import Flask
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.register_blueprint(api_blueprint.api, url_prefix='/api')
 app.register_blueprint(assistant, url_prefix='/assistant')
 app.register_blueprint(home, url_prefix='/home')
