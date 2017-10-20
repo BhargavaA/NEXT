@@ -27,6 +27,12 @@ initExp:
           description: Confidence value of result.
           type: num
 
+getQuery:
+  args:
+    args:
+      values:
+        init_arm:
+          type: num
 
 processAnswer:
   args:

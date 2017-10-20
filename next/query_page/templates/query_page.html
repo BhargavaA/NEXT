@@ -48,6 +48,11 @@
 
     <script>
       next_widget.setUrl("");
+
+      var urlParams = new URLSearchParams(window.location.search);
+      var initArm = urlParams.get('init_arm');
+      console.log('initArm:', initArm);
+
       var tries =  {{experiment['args']['num_tries']}};
       var div_id = "wrapper";
       var exp_uid = "{{exp_uid}}";
@@ -64,6 +69,7 @@
           exp_uid: exp_uid,
           args: {
 	      participant_uid: participant_uid,
+        init_arm: initArm,
 	      widget: true
 	  }
       };
@@ -78,11 +84,11 @@
             $('#debrief').modal('show');
           }
         },
-	  
+
         getQuery_success: function(){
           console.log("successfully got a query")
         },
-	  
+
         widget_failure: function(){
           $('#query').hide();
           $('#debrief').show();
