@@ -22,6 +22,7 @@ import sys
 from collections import OrderedDict
 import numpy as np
 import requests
+from pprint import pprint
 import json
 
 sys.path.append('../../next/lib')
@@ -38,12 +39,14 @@ def launch(targets_filename=None, upload=False):
     n = len(keys)
     d = len(target_dictionary[keys[0]]['context'])
     for i, key in enumerate(keys):
-        targetset.append({'target_id': str(i),
+        targetset.append({'target_id': i,
                           'primary_type': 'image',
                           'primary_description': 'http://localhost:8999/' + target_dictionary[key]['name'],
                           'context': str(target_dictionary[key]['context']),
                           'alt_type': 'text',
                           'alt_description': 'Image {}'.format(i)})
+
+    pprint(targetset)
 
     supported_alg_ids = ['RandomSampling']
 
