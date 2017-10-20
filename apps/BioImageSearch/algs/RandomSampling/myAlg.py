@@ -9,14 +9,13 @@ class MyAlg:
   def initExp(self, butler, n, d, failure_probability):
     unasked_arms = range(n)
     expected_rewards = ra.normal(0, 1, n)
-    received_rewards = []
     butler.algorithms.set(key='n', value=n)
     butler.algorithms.set(key='d', value=d)
     butler.algorithms.set(key='delta', value=failure_probability)
     butler.algorithms.set(key='unasked_arms', value=unasked_arms)
     butler.algorithms.set(key='expected_rewards', value=expected_rewards.tolist())
     butler.algorithms.set(key='num_reported_answers', value=0)
-    butler.algorithms.set(key='received_rewards', value=received_rewards)
+    butler.algorithms.set(key='received_rewards', value=[])
     return True
 
   def getQuery(self, butler):
@@ -28,8 +27,7 @@ class MyAlg:
     return [next_arm]
 
   def processAnswer(self, butler, arm_id, reward):
-    received_rewards = butler.algorithms.get(key='received_rewards')
-    butler.algorithms.set(key='received_rewards', value=received_rewards.append(reward))
+    butler.algorithms.append(key='received_rewards', value=reward)
     butler.algorithms.increment(key='num_reported_answers')
     return True
 
