@@ -42,7 +42,7 @@ def launch(targets_filename=None, upload=False):
         targetset.append({'target_id': i,
                           'primary_type': 'image',
                           'primary_description': 'http://localhost:8999/' + target_dictionary[key]['name'],
-                          'context': str(target_dictionary[key]['context']),
+                          'context': target_dictionary[key]['context'],
                           'alt_type': 'text',
                           'alt_description': 'Image {}'.format(i)})
 
