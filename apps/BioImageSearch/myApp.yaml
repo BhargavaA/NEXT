@@ -37,13 +37,9 @@ getQuery:
 processAnswer:
   args:
     args:
-      type: dict
       values:
-        image_id:
-          description: The index of the image shown
-          type: num
-        rewards:
-          description: The reward +1 (for yes), -1 (for no)
-          type: num
-
+        target_rewards:
+          type: list
+          values:
+            type: num
 

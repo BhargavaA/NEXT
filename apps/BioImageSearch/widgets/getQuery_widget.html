@@ -121,7 +121,7 @@
 
   // }
 
-  function submit(reward, index) {
-    next_widget.processAnswer({"answer": {"target_reward": reward}});
+  function submit(reward) {
+    next_widget.processAnswer({"target_rewards": [reward]});
   }
 </script>

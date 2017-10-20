@@ -56,8 +56,10 @@ class MyApp:
 
     def processAnswer(self, butler, alg, args):
         query = butler.queries.get(uid=args['query_uid'])
-        target = query['target_indices']
-        reward = args['answer']['target_reward']
+        targets = query['target_indices']
+        rewards = args['target_rewards']
+
+        print(targets, rewards)
 
         experiment = butler.experiment.get()
         num_reported_answers = butler.experiment.increment(key='num_reported_answers_for_' + query['alg_label'])
@@ -67,8 +69,11 @@ class MyApp:
             butler.job('getModel', json.dumps(
                 {'exp_uid': butler.exp_uid, 'args': {'alg_label': query['alg_label'], 'logging': True}}))
 
-        alg({'arm_id': target, 'reward': reward})
-        return {'target_id': target, 'target_reward': reward}
+
+        for target, reward in zip(targets, rewards):
+            alg({'arm_id': target, 'reward': reward})
+
+        return {'target_ids': targets, 'target_rewards': rewards}
 
     def getModel(self, butler, alg, args):
         return alg()
