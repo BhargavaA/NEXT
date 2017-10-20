@@ -1,6 +1,16 @@
 <style>
-  img.query {
-    width: 100%;
+  .images-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+
+  .images .query {
+    height: 50%;
+  }
+
+
+  .answers {
+    padding-top: 5em;
   }
 </style>
 
@@ -69,12 +79,10 @@
 </div>
 #}
 
-<div class="row">
-  <div class="col-md-3">
-    <img class="center-block img-responsive query" src="{{ query.targets[0].primary_description }}">
-  </div>
-  <div class="col-md-3">
-    <img class="center-block img-responsive context" src="{{ query.init_target.primary_description }}">
+<div class="images-wrapper">
+  <div class="images">
+    <img class="query" src="{{ query.targets[0].primary_description }}">
+    <img class="context" src="{{ query.init_target.primary_description }}">
   </div>
 </div>
 
@@ -97,7 +105,13 @@
 </div>
 #}
 
-<div class="query">
+<div class="answers row">
+  <div class="col-md-6">
+    <div class="btn btn-default btn-block" onclick="submit(1)">Similar</div>
+  </div>
+  <div class="col-md-6">
+    <div class="col btn btn-default btn-block" onclick="submit(-1)">Unsimilar</div>
+  </div>
 </div>
 
 
