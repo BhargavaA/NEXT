@@ -29,21 +29,15 @@ getQuery:
       2:
         type: num
         description: The ID of the right target
-      
+
 processAnswer:
     args:
-      center_id:
-        description: The ID of the center target
+      arm_id:
         type: num
-      left_id: 
-        description: The ID of the left target
+
+      reward:
         type: num
-      right_id: 
-        description: The ID of the right target
-        type: num
-      target_winner:
-        description: The ID of the target that won the given query.
-        type: num
+
     rets:
       type: bool
       description: A boolean indicating success
