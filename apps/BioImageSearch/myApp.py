@@ -34,11 +34,14 @@ class MyApp:
         n = experiment['args']['n']
         exp_uid = experiment['exp_uid']
         participant_uid = args['participant_uid']
-
+        num_responses = butler.participants.get(uid=participant_uid, key='num_responses')
         alg_response = alg()
         exp_uid = butler.exp_uid
         init_arm = int(args['init_arm'])
         print('init_arm:', init_arm)
+
+        if num_responses == 0 or num_responses is None:
+            butler.participants.set(uid=participant_uid, key='init_arm', value=init_arm)
 
         next_arm = alg_response[0]
         target = self.TargetManager.get_target_item(exp_uid, next_arm)
@@ -56,22 +59,30 @@ class MyApp:
 
     def processAnswer(self, butler, alg, args):
         query = butler.queries.get(uid=args['query_uid'])
+        participant_uid = query['participant_uid']
+        exp_uid = query['exp_uid']
         targets = query['target_indices']
         rewards = args['target_rewards']
-
-        print(targets, rewards)
+        num_responses = butler.participants.increment(uid=participant_uid, key='num_responses')
+        # print(targets, rewards)
 
         experiment = butler.experiment.get()
+        num_responses = butler.participants.get(uid=participant_uid, key='num_responses')
+        init_arm = butler.participants.get(uid=participant_uid, key='init_arm')
+        utils.debug_print('Num user responses: %d' % num_responses)
         num_reported_answers = butler.experiment.increment(key='num_reported_answers_for_' + query['alg_label'])
+        init_context = self.TargetManager.get_target_item(exp_uid, init_arm)['context']
+
 
         n = experiment['args']['n']
         if num_reported_answers % ((n+4)/4) == 0:
             butler.job('getModel', json.dumps(
                 {'exp_uid': butler.exp_uid, 'args': {'alg_label': query['alg_label'], 'logging': True}}))
 
-
         for target, reward in zip(targets, rewards):
-            alg({'arm_id': target, 'reward': reward})
+            arm_context = self.TargetManager.get_target_item(exp_uid, target)['context']
+            alg({'arm_context': arm_context, 'reward': reward, 'num_responses': num_responses, 'init_context': init_context,
+                 'participant_uid': participant_uid})
 
         return {'target_ids': targets, 'target_rewards': rewards}
 

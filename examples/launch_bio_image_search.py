@@ -46,7 +46,7 @@ def launch(targets_filename=None, upload=False):
                           'alt_type': 'text',
                           'alt_description': 'Image {}'.format(i)})
 
-    pprint(targetset)
+    # pprint(targetset)
 
     supported_alg_ids = ['RandomSampling']
 

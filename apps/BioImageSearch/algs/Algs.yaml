@@ -32,11 +32,20 @@ getQuery:
 
 processAnswer:
     args:
-      arm_id:
-        type: num
+      arm_context:
+        type: any
 
       reward:
         type: num
+
+      num_responses:
+        type: num
+
+      init_context:
+        type: any
+
+      participant_uid:
+        type: str
 
     rets:
       type: bool

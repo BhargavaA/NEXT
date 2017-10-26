@@ -1,7 +1,6 @@
 import time
 import numpy.random as ra
 import numpy as np
-from apps.PoolBasedTripletMDS.algs.RandomSampling import utilsMDS
 import next.utils as utils
 
 
@@ -26,9 +25,11 @@ class MyAlg:
     butler.algorithms.set(key='unasked_arms', value=unasked_arms)
     return [next_arm]
 
-  def processAnswer(self, butler, arm_id, reward):
-    butler.algorithms.append(key='received_rewards', value=reward)
-    butler.algorithms.increment(key='num_reported_answers')
+  def processAnswer(self, butler, arm_context, reward, num_responses, init_context, participant_uid):
+    if num_responses == 1:
+        butler.participants.set(uid=participant_uid, key='received_rewards', value=[])
+    butler.participants.append(key='received_rewards', value=reward)
+    butler.participants.increment(key='num_reported_answers')
     return True
 
   def getModel(self, butler):
