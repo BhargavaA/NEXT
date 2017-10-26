@@ -85,8 +85,8 @@ class MyAlg:
         expected_rewards = np.dot(features, theta_hat) + sqrt_beta * np.sqrt(x_invVt_norm)
 
         butler.participants.set(uid=participant_uid, key='arm_order', value=np.argsort(expected_rewards)[::-1])
-        butler.participants.set(key='invVt', value=invVt)
-        butler.participants.set(key='b', value=b)
+        butler.participants.set(uid=participant_uid, key='invVt', value=invVt)
+        butler.participants.set(uid=participant_uid, key='b', value=b)
 
         return True
 
