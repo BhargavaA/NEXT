@@ -24,7 +24,7 @@ class MyAlg:
     butler.participants.append(key='do_not_ask', value=ask_list[0])
     return [ask_list[0]]
 
-  def processAnswer(self, butler, arm_context, reward, num_responses, init_context, participant_uid):
+  def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid):
     if num_responses == 1:
         butler.participants.set(uid=participant_uid, key='received_rewards', value=[])
     butler.participants.append(key='received_rewards', value=reward)

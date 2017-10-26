@@ -12,8 +12,8 @@ class SimpleTargetManager(object):
         for i,target in enumerate(targetset):
             target['target_id'] = i
             target['exp_uid'] = exp_uid
-            utils.debug_print('Trying to set target_id:%d' % i)
-            utils.debug_print('Target: ', target)
+            # utils.debug_print('Trying to set target_id:%d' % i)
+            # utils.debug_print('Target: ', target)
 
             try:
                 self.db.set_doc(self.bucket_id, None, target)

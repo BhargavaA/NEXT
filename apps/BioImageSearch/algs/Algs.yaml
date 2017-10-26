@@ -24,7 +24,7 @@ getQuery:
 
 processAnswer:
     args:
-      arm_context:
+      arm_id:
         type: any
 
       reward:
@@ -33,7 +33,7 @@ processAnswer:
       num_responses:
         type: num
 
-      init_context:
+      init_id:
         type: any
 
       participant_uid:

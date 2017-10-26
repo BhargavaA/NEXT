@@ -100,7 +100,7 @@ class MyApp:
 
         for target, reward in zip(targets, rewards):
             arm_context = self.TargetManager.get_target_item(exp_uid, target)['context']
-            alg({'arm_context': arm_context, 'reward': reward, 'num_responses': num_responses, 'init_context': init_context,
+            alg({'arm_id': target, 'reward': reward, 'num_responses': num_responses, 'init_id': init_arm,
                  'participant_uid': participant_uid})
 
         return {'target_ids': targets, 'target_rewards': rewards}
