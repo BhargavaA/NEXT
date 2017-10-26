@@ -16,19 +16,11 @@ initExp:
 
 
 getQuery:
+  participant_uid:
+    type: str
   rets:
-    description: The triplet to ask about
-    type: tuple
-    values:
-      0:
-        type: num
-        description: The ID of the center target
-      1:
-        type: num
-        description: The ID of the left target
-      2:
-        type: num
-        description: The ID of the right target
+    description: list of sorted targets
+    type: any
 
 processAnswer:
     args:

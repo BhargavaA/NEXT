@@ -17,13 +17,12 @@ class MyAlg:
     butler.algorithms.set(key='received_rewards', value=[])
     return True
 
-  def getQuery(self, butler):
-    expected_rewards = np.array(butler.algorithms.get(key='expected_rewards'))
-    unasked_arms = np.array(butler.algorithms.get(key='unasked_arms'))
-    next_arm = unasked_arms[np.argmax(expected_rewards[unasked_arms])]
-    unasked_arms = np.setdiff1d(unasked_arms, next_arm)
-    butler.algorithms.set(key='unasked_arms', value=unasked_arms)
-    return [next_arm]
+  def getQuery(self, butler, participant_uid):
+    arm_order = butler.participants.get(uid=participant_uid, key='arm_order')
+    do_not_ask = butler.participants.get(uid=participant_uid, key='do_not_ask')
+    ask_list = np.setdiff1d(arm_order, do_not_ask)
+    butler.participants.append(key='do_not_ask', value=ask_list[0])
+    return [ask_list[0]]
 
   def processAnswer(self, butler, arm_context, reward, num_responses, init_context, participant_uid):
     if num_responses == 1:

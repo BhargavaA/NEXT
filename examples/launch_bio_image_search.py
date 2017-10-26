@@ -48,7 +48,7 @@ def launch(targets_filename=None, upload=False):
 
     # pprint(targetset)
 
-    supported_alg_ids = ['RandomSampling']
+    supported_alg_ids = ['EpsilonGreedy']
 
     alg_list = []
     for alg_id in supported_alg_ids:

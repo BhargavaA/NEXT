@@ -14,7 +14,15 @@ class MyApp:
         exp_uid = butler.exp_uid
         if 'targetset' in args['targets'].keys():
             n = len(args['targets']['targetset'])
-            self.TargetManager.set_targetset(exp_uid, args['targets']['targetset'])
+            targets = args['targets']['targetset']
+            self.TargetManager.set_targetset(exp_uid, targets)
+            d = args['d']
+            features = np.zeros((n, d))
+            for i in range(n):
+                features[i, :] = targets[i]['context']
+
+            np.save('features.npy', features)
+
         else:
             n = args['targets']['n']
         args['n'] = n
@@ -35,13 +43,24 @@ class MyApp:
         exp_uid = experiment['exp_uid']
         participant_uid = args['participant_uid']
         num_responses = butler.participants.get(uid=participant_uid, key='num_responses')
-        alg_response = alg()
-        exp_uid = butler.exp_uid
         init_arm = int(args['init_arm'])
         print('init_arm:', init_arm)
+        if num_responses == 0 or num_responses is None:
+            butler.participants.set(uid=participant_uid, key='init_arm', value=init_arm)
+            arm_order = range(n)
+            np.random.shuffle(arm_order)
+            butler.participants.set(uid=participant_uid, key='arm_order', value=arm_order)
+            butler.participants.set(uid=participant_uid, key='do_not_ask', value=[init_arm])
+            print('Initialized lists in getQuery')
+
+        alg_response = alg({'participant_uid': participant_uid})
+        exp_uid = butler.exp_uid
 
         if num_responses == 0 or num_responses is None:
             butler.participants.set(uid=participant_uid, key='init_arm', value=init_arm)
+            arm_order = range(n)
+            np.random.shuffle(arm_order)
+            butler.participants.set(uid=participant_uid, key='arm_order', value=arm_order)
 
         next_arm = alg_response[0]
         target = self.TargetManager.get_target_item(exp_uid, next_arm)

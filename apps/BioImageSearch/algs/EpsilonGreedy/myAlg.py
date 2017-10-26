@@ -6,34 +6,31 @@ import next.utils as utils
 
 class MyAlg:
     def initExp(self, butler, n, d, failure_probability):
-        unasked_arms = range(n)
-        expected_rewards = ra.normal(0, 1, n)
         butler.algorithms.set(key='n', value=n)
         butler.algorithms.set(key='d', value=d)
         butler.algorithms.set(key='delta', value=failure_probability)
-        butler.algorithms.set(key='unasked_arms', value=unasked_arms)
-        butler.algorithms.set(key='expected_rewards', value=expected_rewards.tolist())
-        butler.algorithms.set(key='num_reported_answers', value=0)
-        butler.algorithms.set(key='received_rewards', value=[])
         return True
 
-    def getQuery(self, butler):
-        expected_rewards = np.array(butler.algorithms.get(key='expected_rewards'))
-        unasked_arms = np.array(butler.algorithms.get(key='unasked_arms'))
+    def getQuery(self, butler, participant_uid):
+        arm_order = butler.participants.get(uid=participant_uid, key='arm_order')
+        do_not_ask = butler.participants.get(uid=participant_uid, key='do_not_ask')
+        ask_list = np.setdiff1d(arm_order, do_not_ask)
+
         epsilon = butler.experiment.get(key='epsilon')
         if ra.rand() <= epsilon:
-            next_arm = np.random.choice(unasked_arms)
+            next_arm = np.random.choice(ask_list)
         else:
-            next_arm = unasked_arms[np.argmax(expected_rewards[unasked_arms])]
+            next_arm = ask_list[0]
 
-        unasked_arms = np.setdiff1d(unasked_arms, next_arm)
-        butler.algorithms.set(key='unasked_arms', value=unasked_arms)
+        butler.participants.append(key='do_not_ask', value=next_arm)
         return [next_arm]
 
     def processAnswer(self, butler, arm_context, reward, num_responses, init_context, participant_uid):
         if num_responses == 1:
-            d = butler.experiment.get(key='d')
-            ridge = butler.experiment.get(key='ridge')
+            d = butler.algorithms.get(key='d')
+            ridge = butler.algorithms.get(key='ridge')
+            print('d =%d' % d)
+            print('ridge: ', ridge)
             invVt = np.eye(d)*ridge
             b = np.zeros(d)
             theta_hat = np.array(init_context)
@@ -63,18 +60,18 @@ class MyAlg:
 
         invVt = butler.participants.get(uid=participant_uid, key='invVt')
         b = butler.participants.get(uid=participant_uid, key='b')
+        features = np.load('features.npy')
 
         u = invVt.dot(arm_context)
         invVt -= np.outer(u, u) / (1 + np.inner(arm_context, u))
 
         # x_invVt_norm -= np.dot(X, u) ** 2 / (1 + np.inner(arm_pulled, u))
 
-        b += reward * arm_pulled
-        theta_hat = X[i_hat, :] + invV.dot(b)
+        b += reward * arm_context
+        theta_hat = invVt.dot(b)
 
-
-        expected_rewards = np.dot(X, theta_hat)
-
+        expected_rewards = np.dot(features, theta_hat)
+        butler.participants.set(uid=participant_uid, key='arm_order', value=np.argsort(expected_rewards)[::-1])
 
         return True
 
