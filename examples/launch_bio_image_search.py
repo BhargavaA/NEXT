@@ -48,7 +48,7 @@ def launch(targets_filename=None, upload=False):
 
     # pprint(targetset)
 
-    supported_alg_ids = ['EpsilonGreedy']
+    supported_alg_ids = ['OFUL']
 
     alg_list = []
     for alg_id in supported_alg_ids:

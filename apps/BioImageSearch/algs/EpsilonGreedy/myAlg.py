@@ -43,7 +43,7 @@ class MyAlg:
         butler.participants.increment(key='num_reported_answers')
 
         task_args = {
-            'arm_context': arm_id,
+            'arm_id': arm_id,
             'reward': reward,
             'participant_uid': participant_uid
         }
@@ -53,24 +53,24 @@ class MyAlg:
         return True
 
     def modelUpdate(self, butler, task_args):
-        arm_context = task_args['arm_context']
+        arm_id = task_args['arm_id']
         reward = task_args['reward']
         participant_uid = task_args['participant_uid']
 
         invVt = np.array(butler.participants.get(uid=participant_uid, key='invVt'))
         b = np.array(butler.participants.get(uid=participant_uid, key='b'))
         features = np.load('features.npy')
+        xt = features[arm_id, :]
 
-        u = invVt.dot(features[arm_context,:])
-        invVt -= np.outer(u, u) / (1 + np.inner(features[arm_context,:], u))
-
-        # x_invVt_norm -= np.dot(X, u) ** 2 / (1 + np.inner(arm_pulled, u))
-
-        b += reward * arm_context
+        u = invVt.dot(xt)
+        invVt -= np.outer(u, u) / (1 + np.inner(xt, u))
+        b += reward * xt
         theta_hat = invVt.dot(b)
-
         expected_rewards = np.dot(features, theta_hat)
+
         butler.participants.set(uid=participant_uid, key='arm_order', value=np.argsort(expected_rewards)[::-1])
+        butler.participants.set(key='invVt', value=invVt)
+        butler.participants.set(key='b', value=b)
 
         return True
 
