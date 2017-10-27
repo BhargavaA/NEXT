@@ -69,6 +69,14 @@ def launch(targets_filename=None, upload=False):
                 'L': 1.0,
                 'c': 1.0
             }
+        elif alg_id == 'QOFUL':
+            alg_item['params'] = {
+                'ridge': 1.0,
+                'R': 1.0,
+                'S': 1.0,
+                'L': 1.0,
+                'c1': 1.0
+            }
         elif alg_id == 'GLOC':
             S = 1.0
             kappa = 1 / ((1 + np.exp(S)) * (1 + np.exp(-S)))
