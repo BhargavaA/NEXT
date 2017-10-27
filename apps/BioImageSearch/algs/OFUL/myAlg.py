@@ -35,7 +35,7 @@ class MyAlg:
             d = butler.algorithms.get(key='d')
             n = butler.algorithms.get(key='n')
             ridge = butler.algorithms.get(key='ridge')
-            invVt = np.eye(d)*ridge
+            invVt = np.eye(d) / ridge
             b = np.zeros(d)
             x_invVt_norm = np.ones(n) / ridge
 
@@ -87,6 +87,7 @@ class MyAlg:
         butler.participants.set(uid=participant_uid, key='arm_order', value=np.argsort(expected_rewards)[::-1])
         butler.participants.set(uid=participant_uid, key='invVt', value=invVt)
         butler.participants.set(uid=participant_uid, key='b', value=b)
+        butler.participants.set(uid=participant_uid, key='x_invVt_norm', value=x_invVt_norm)
 
         return True
 
