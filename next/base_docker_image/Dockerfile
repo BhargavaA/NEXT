@@ -9,5 +9,6 @@ RUN \
 	apt-get install -y mongodb-org
 
 # Install python dependencies for next_backend
+RUN pip install numpy==1.13.1
 ADD requirements.txt /requirements.txt
 RUN pip install -U -r requirements.txt

@@ -40,7 +40,7 @@ class MyAlg:
             d = butler.algorithms.get(key='d')
             n = butler.algorithms.get(key='n')
             ridge = butler.algorithms.get(key='ridge')
-            S = butler.participants.get(key='S')
+            S = butler.algorithms.get(key='S')
 
             invVt = np.eye(d) / ridge
             Vt = np.eye(d) * ridge
@@ -87,9 +87,9 @@ class MyAlg:
         c = butler.algorithms.get(key='c')
         kappa = butler.algorithms.get(key='kappa')
 
-        sum_z_t_sq = butler.participants.get(key='sum_z_t_sq')
-        radius_problem_constant = butler.participants.get(key='radius_problem_constant')
-        theta_s = butler.participants.get(key='theta_s')
+        sum_z_t_sq = butler.participants.get(uid=participant_uid, key='sum_z_t_sq')
+        radius_problem_constant = butler.participants.get(uid=participant_uid, key='radius_problem_constant')
+        theta_s = butler.participants.get(uid=participant_uid, key='theta_s')
         Vt = np.array(butler.participants.get(uid=participant_uid, key='Vt'))
         invVt = np.array(butler.participants.get(uid=participant_uid, key='invVt'))
         b = np.array(butler.participants.get(uid=participant_uid, key='b'))
@@ -119,7 +119,7 @@ class MyAlg:
 
         radius_problem_constant += (g_t ** 2) * np.dot(xt, np.dot(invVt, xt))
 
-        radius = c * self._calc_radius_sq_new(R, t, kappa, radius_problem_constant, theta_hat, sum_z_t_sq, XTz, ridge)
+        radius = c * self._calc_radius_sq_new(R, t, kappa, radius_problem_constant, theta_hat, sum_z_t_sq, XTz, ridge, S)
 
         expected_rewards = np.dot(features, theta_hat) + np.sqrt(radius) * np.sqrt(
             np.sum(np.dot(features, invVt) * features, axis=1))
@@ -153,7 +153,7 @@ class MyAlg:
         return np.array(th.value).flatten()
 
     @staticmethod
-    def _calc_radius_sq_new(R, t, kappa, radius_problem_constant, theta_hat, sum_z_t_sq, XTz, ridge):
+    def _calc_radius_sq_new(R, t, kappa, radius_problem_constant, theta_hat, sum_z_t_sq, XTz, ridge, S):
         dt = 0.2
         if (t == 1):
             radius_sq = 0
