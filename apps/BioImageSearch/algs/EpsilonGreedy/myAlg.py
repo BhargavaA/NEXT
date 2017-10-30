@@ -9,6 +9,10 @@ class MyAlg:
         butler.algorithms.set(key='n', value=n)
         butler.algorithms.set(key='d', value=d)
         butler.algorithms.set(key='delta', value=failure_probability)
+
+        if butler.dashboard.get(key='plot_data') is None:
+            butler.dashboard.set(key='plot_data', value=[])
+
         return True
 
     def getQuery(self, butler, participant_uid):
@@ -41,6 +45,16 @@ class MyAlg:
 
         butler.participants.append(key='received_rewards', value=reward)
         butler.participants.increment(key='num_reported_answers')
+
+        update_plot_data = {'rewards': reward,
+                            'participant_uid': participant_uid,
+                            'initial_arm': init_id,
+                            'arm_pulled': arm_id,
+                            'alg': 'TS',
+                            'time': num_responses
+                            }
+
+        butler.dashboard.append(key='plot_data', value=update_plot_data)
 
         task_args = {
             'arm_id': arm_id,

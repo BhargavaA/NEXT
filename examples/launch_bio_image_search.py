@@ -48,7 +48,7 @@ def launch(targets_filename=None, upload=False):
 
     # pprint(targetset)
 
-    supported_alg_ids = ['GLOC']
+    supported_alg_ids = ['TS']
 
     alg_list = []
     for alg_id in supported_alg_ids:
@@ -76,6 +76,12 @@ def launch(targets_filename=None, upload=False):
                 'S': 1.0,
                 'L': 1.0,
                 'c1': 1.0
+            }
+        elif alg_id == 'TS':
+            alg_item['params'] = {
+                'ridge': 1.0,
+                'R': 1.0,
+                'multiplier': 1.0
             }
         elif alg_id == 'GLOC':
             S = 1.0
