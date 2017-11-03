@@ -38,7 +38,7 @@ class MyAlg:
                     break
 
         # butler.participants.append(uid=participant_uid, key='do_not_ask', value=next_arm)
-        return [return_arms]
+        return return_arms
 
     def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid):
         if num_responses == 1:

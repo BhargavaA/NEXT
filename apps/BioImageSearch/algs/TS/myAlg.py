@@ -38,7 +38,7 @@ class MyAlg:
                 if counter >= num_return:
                     break
 
-        return [return_arms]
+        return return_arms
 
     def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid):
         if num_responses == 1:

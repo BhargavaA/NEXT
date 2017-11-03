@@ -62,7 +62,10 @@ class MyApp:
             np.random.shuffle(arm_order)
             butler.participants.set(uid=participant_uid, key='arm_order', value=arm_order)
 
+        utils.debug_print('Alg_resp:', alg_response)
         next_arm = alg_response[0]
+        utils.debug_print('Alg_resp:', next_arm)
+
         target = self.TargetManager.get_target_item(exp_uid, next_arm)
         init_target = init_arm and self.TargetManager.get_target_item(exp_uid, init_arm)
 
