@@ -28,12 +28,17 @@ class MyAlg:
         arm_order = butler.participants.get(uid=participant_uid, key='arm_order')
         do_not_ask = butler.participants.get(uid=participant_uid, key='do_not_ask')
 
+        num_return = 16
+        counter = 0
+        return_arms = []
         for next_arm in arm_order:
-            if next_arm not in do_not_ask:
-                break
+            if next_arm not in do_not_ask and next_arm not in return_arms:
+                counter += 1
+                return_arms.append(next_arm)
+                if counter >= num_return:
+                    break
 
-        butler.participants.append(uid=participant_uid, key='do_not_ask', value=next_arm)
-        return [next_arm]
+        return [return_arms]
 
     def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid):
         if num_responses == 1:
@@ -50,6 +55,7 @@ class MyAlg:
             butler.participants.set(uid=participant_uid, key='x_invVt_norm', value=x_invVt_norm)
             butler.participants.set(uid=participant_uid, key='logDetV', value=d * np.log(ridge))
 
+        butler.participants.append(uid=participant_uid, key='do_not_ask', value=arm_id)
         butler.participants.append(uid=participant_uid, key='received_rewards', value=reward)
         butler.participants.increment(uid=participant_uid, key='num_reported_answers')
 

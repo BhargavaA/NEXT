@@ -16,19 +16,28 @@ class MyAlg:
         return True
 
     def getQuery(self, butler, participant_uid):
+        epsilon = butler.algorithms.get(key='params')['epsilon']
         arm_order = butler.participants.get(uid=participant_uid, key='arm_order')
         do_not_ask = butler.participants.get(uid=participant_uid, key='do_not_ask')
-        epsilon = butler.algorithms.get(key='params')['epsilon']
 
-        if ra.rand() <= epsilon:
-            next_arm = np.random.choice(np.setdiff1d(arm_order, do_not_ask))
-        else:
-            for next_arm in arm_order:
-                if next_arm not in do_not_ask:
-                    break
+        num_return = 16
+        counter = 0
+        return_arms = []
 
-        butler.participants.append(uid=participant_uid, key='do_not_ask', value=next_arm)
-        return [next_arm]
+        while True:
+            if ra.rand() <= epsilon:
+                next_arm = np.random.choice(np.setdiff1d(arm_order, np.union1d(do_not_ask, return_arms)))
+            else:
+                for next_arm in arm_order:
+                    if next_arm not in do_not_ask and next_arm not in return_arms:
+                        break
+
+            counter += 1
+            return_arms.append(next_arm)
+            if counter >= num_return:
+                break
+
+        return [return_arms]
 
     def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid):
         if num_responses == 1:
@@ -43,6 +52,7 @@ class MyAlg:
             butler.participants.set(uid=participant_uid, key='b', value=b)
             # butler.participants.set(uid=participant_uid, key='theta_hat', value=theta_hat)
 
+        butler.participants.append(uid=participant_uid, key='do_not_ask', value=arm_id)
         butler.participants.append(key='received_rewards', value=reward)
         butler.participants.increment(key='num_reported_answers')
 
