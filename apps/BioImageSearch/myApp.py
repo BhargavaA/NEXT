@@ -63,15 +63,14 @@ class MyApp:
             butler.participants.set(uid=participant_uid, key='arm_order', value=arm_order)
 
         utils.debug_print('Alg_resp:', alg_response)
-        next_arm = alg_response[0]
-        utils.debug_print('Alg_resp:', next_arm)
+        target_indices = alg_response
 
-        target = self.TargetManager.get_target_item(exp_uid, next_arm)
+        targets = [self.TargetManager.get_target_item(exp_uid, a) for a in target_indices]
         init_target = init_arm and self.TargetManager.get_target_item(exp_uid, init_arm)
 
         return_dict = {
-            'target_indices': [next_arm],
-            'targets': [target],
+            'target_indices': target_indices,
+            'targets': targets,
             'init_target': init_target,
             'instructions': 'Is this the kind of image you are looking for?',
             'count': 1,
