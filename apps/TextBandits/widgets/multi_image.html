@@ -1,0 +1,56 @@
+<style>
+  .images {
+    border: 1px solid black;
+    width: 100%;
+
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .images img {
+    cursor: pointer;
+    margin: 4px;
+  }
+
+  img.selected {
+    border: 1px solid red;
+  }
+
+  .answers {
+    padding-top: 5em;
+  }
+</style>
+
+<div class="images">
+{%- for target in query.targets %}
+  <img src="{{target.primary_description}}" data-i="{{loop.index0}}" onclick="clickImage(event)">
+{%- endfor %}
+</div>
+<img class="context" src="{{ query.init_target.primary_description }}">
+
+<div class="reward">
+  <div class="btn btn-default btn-lg" onclick="submit()">submit</div>
+</div>
+
+<script>
+  let target_rewards = Array({{query.targets|length}}).fill(-1);
+
+  function submit() {
+    console.log('submit');
+    next_widget.processAnswer({"target_rewards": target_rewards});
+  }
+
+  function clickImage(e, i) {
+    const el = e.srcElement;
+    i = el.getAttribute('data-i');
+    if (el.classList.contains('selected'))  {
+      el.classList.remove('selected');
+      target_rewards[i] = -1;
+    } else {
+      el.classList.add('selected');
+      target_rewards[i] = 1;
+    }
+
+    console.log(target_rewards);
+  }
+</script>

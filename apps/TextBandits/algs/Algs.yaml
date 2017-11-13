@@ -1,0 +1,57 @@
+initExp:
+  args:
+    n:
+      description: Number of targets
+      type: num
+    d:
+      description: Dimension of embedding
+      type: num
+    failure_probability:
+      description: Confidence of result
+      type: num
+  rets:
+    type: bool
+    description: A boolean indicating success
+    values: true
+
+
+getQuery:
+  participant_uid:
+    type: str
+  rets:
+    description: list of sorted targets
+    type: any
+
+processAnswer:
+    args:
+      arm_id:
+        type: any
+
+      reward:
+        type: num
+
+      num_responses:
+        type: num
+
+      init_id:
+        type: any
+
+      participant_uid:
+        type: str
+
+    rets:
+      type: bool
+      description: A boolean indicating success
+      values: true
+
+getModel:
+  rets:
+    type: dict
+    description: The current state of the model
+    values:
+      X:
+        description: The embedding
+        type: stuff
+      num_reported_answers:
+        description: How many answers have been reported (for this algorithm)
+        type: num

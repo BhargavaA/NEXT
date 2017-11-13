@@ -1,0 +1,5 @@
+{%- if query.targets|length == 1 %}
+  {%- include 'single_image.html' %}
+{%- else %}
+  {%- include 'multi_image.html' %}
+{%- endif %}
