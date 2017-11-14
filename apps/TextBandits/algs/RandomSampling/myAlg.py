@@ -10,8 +10,8 @@ class MyAlg:
     butler.algorithms.set(key='d', value=d)
     butler.algorithms.set(key='delta', value=failure_probability)
 
-    if butler.dashboard.get(key='plot_data') is None:
-        butler.dashboard.set(key='plot_data', value=[])
+    if butler.experiment.get(key='plot_data') is None:
+        butler.experiment.set(key='plot_data', value=[])
 
     return True
 

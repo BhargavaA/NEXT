@@ -2,7 +2,7 @@ extends: [base.yaml]
 initExp:
   args:
     app_id:
-      values: [BioImageSearch]
+      values: [TextBandits]
     args:
       values:
         alg_list:
@@ -26,6 +26,12 @@ initExp:
         failure_probability:
           description: Confidence value of result.
           type: num
+        matrix:
+          type: any
+          optional: true
+        name_to_index_dict:
+          type: any
+          optional: true
 
 getQuery:
   args:

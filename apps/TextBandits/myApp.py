@@ -3,6 +3,7 @@ import json
 import next.utils as utils
 import next.apps.SimpleTargetManager
 import numpy as np
+from scipy import sparse
 
 
 class MyApp:
@@ -17,9 +18,15 @@ class MyApp:
             targets = args['targets']['targetset']
             self.TargetManager.set_targetset(exp_uid, targets)
             d = args['d']
-            features = np.zeros((n, d))
-            for i in range(n):
-                features[i, :] = targets[i]['context']
+
+            rows = args['matrix']['rows']
+            cols = args['matrix']['cols']
+            data = args['matrix']['data']
+            shape = args['matrix']['shape']
+            features = sparse.coo_matrix((data, (rows, cols)), shape=(shape[0], shape[1])).tocsr()
+
+            word_to_index_dict = args['name_to_index_dict']
+            butler.experiment.set(key='word_to_index_dict', value=word_to_index_dict)
 
             np.save('features.npy', features)
 
