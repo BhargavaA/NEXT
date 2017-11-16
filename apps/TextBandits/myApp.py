@@ -70,16 +70,15 @@ class MyApp:
             butler.participants.set(uid=participant_uid, key='arm_order', value=arm_order)
 
         utils.debug_print('Alg_resp:', alg_response)
-        target_indices = alg_response
 
-        targets = [self.TargetManager.get_target_item(exp_uid, a) for a in target_indices]
+        target = self.TargetManager.get_target_item(exp_uid, alg_response)
         init_target = init_arm and self.TargetManager.get_target_item(exp_uid, init_arm)
 
         return_dict = {
-            'target_indices': target_indices,
-            'targets': targets,
+            'target_indices': alg_response,
+            'targets': target,
             'init_target': init_target,
-            'instructions': 'Is this the kind of image you are looking for?',
+            'instructions': 'Is this the kind of document you are looking for?',
             'count': 1,
         }
 
@@ -91,26 +90,25 @@ class MyApp:
         exp_uid = query['exp_uid']
         targets = query['target_indices']
         rewards = args['target_rewards']
-        num_responses = butler.participants.increment(uid=participant_uid, key='num_responses')
+        butler.participants.increment(uid=participant_uid, key='num_responses')
         # print(targets, rewards)
 
-        experiment = butler.experiment.get()
+        # experiment = butler.experiment.get()
         num_responses = butler.participants.get(uid=participant_uid, key='num_responses')
         init_arm = butler.participants.get(uid=participant_uid, key='init_arm')
         utils.debug_print('Num user responses: %d' % num_responses)
-        num_reported_answers = butler.experiment.increment(key='num_reported_answers_for_' + query['alg_label'])
-        init_context = self.TargetManager.get_target_item(exp_uid, init_arm)['context']
+        # num_reported_answers = butler.experiment.increment(key='num_reported_answers_for_' + query['alg_label'])
+        # init_context = self.TargetManager.get_target_item(exp_uid, init_arm)['context']
 
-
-        n = experiment['args']['n']
-        if num_reported_answers % ((n+4)/4) == 0:
-            butler.job('getModel', json.dumps(
-                {'exp_uid': butler.exp_uid, 'args': {'alg_label': query['alg_label'], 'logging': True}}))
+        # n = experiment['args']['n']
+        # if num_reported_answers % ((n+4)/4) == 0:
+        #     butler.job('getModel', json.dumps(
+        #         {'exp_uid': butler.exp_uid, 'args': {'alg_label': query['alg_label'], 'logging': True}}))
 
         for target, reward in zip(targets, rewards):
-            arm_context = self.TargetManager.get_target_item(exp_uid, target)['context']
+            revealed_indices = [0]
             alg({'arm_id': target, 'reward': reward, 'num_responses': num_responses, 'init_id': init_arm,
-                 'participant_uid': participant_uid})
+                 'participant_uid': participant_uid, 'revealed_indices': revealed_indices})
 
         return {'target_ids': targets, 'target_rewards': rewards}
 

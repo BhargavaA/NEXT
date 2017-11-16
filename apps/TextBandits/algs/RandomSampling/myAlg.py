@@ -20,23 +20,17 @@ class MyAlg:
     do_not_ask = butler.participants.get(uid=participant_uid, key='do_not_ask')
 
     if arm_order is None:
-        n = butler.algorithms.get(n)
+        n = butler.algorithms.get(key='n')
         arm_order = range(n)
         ra.shuffle(arm_order)
 
-    num_return = 16
-    counter = 0
-    return_arms = []
     for next_arm in arm_order:
-        if next_arm not in do_not_ask and next_arm not in return_arms:
-            counter += 1
-            return_arms.append(next_arm)
-            if counter >= num_return:
-                break
+        if next_arm not in do_not_ask:
+            break
 
-    return return_arms
+    return next_arm
 
-  def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid):
+  def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid, revealed_indices):
     if num_responses == 1:
         butler.participants.set(uid=participant_uid, key='received_rewards', value=[])
     butler.participants.append(key='received_rewards', value=reward)

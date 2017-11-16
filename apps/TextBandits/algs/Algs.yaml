@@ -39,6 +39,9 @@ processAnswer:
       participant_uid:
         type: str
 
+      revealed_indices:
+        type: list
+
     rets:
       type: bool
       description: A boolean indicating success
