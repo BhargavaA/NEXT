@@ -50,3 +50,4 @@ nohup.out
 *.swp
 
 local/docker-compose.yml
+local/docker-compose.yml-e
