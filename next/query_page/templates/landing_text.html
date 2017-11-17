@@ -24,35 +24,16 @@
       flex-wrap: wrap;
     }
 
-    .grid img {
-      width: 25%;
-
+    .grid div {
+      width: 25%; height: 25%;
+      border: 2px solid black;
       cursor: pointer;
+
+      overflow: hidden;
     }
 
-    .grid img:hover {
+    .grid div:hover {
       border: 2px solid red;
-    }
-
-    .grid text {
-      width: 25%;
-    }
-
-    .grid text:hover {
-      border: 2px solid red;
-    }
-
-    .text_container{
-	    display:table;
-	    width:100%;
-    }
-    .text{
-	    display: table-cell;
-	    text-align: center;
-	    vertical-align: middle;
-	    word-wrap: break-word;
-	     font-size: 3vmin;
-	    width:100%;
     }
 
     .shuffle {
@@ -60,7 +41,8 @@
       right: 1em;
       top: 1em;
 
-      color: yellow;
+      background-color: yellow;
+      color: black;
 
       text-align: center;
       text-decoration: none;
@@ -71,11 +53,6 @@
       padding: 4px;
 
       cursor: pointer;
-    }
-
-    .shuffle:hover {
-      background-color: yellow;
-      color: black;
     }
   </style>
 </head>
@@ -94,7 +71,7 @@
       {%- for target in target_manager.get_targetset(exp_uid) %}
       {
         target_id: {{target.target_id}},
-        primary_description: "{{target.primary_description}}",
+        primary_description: "{{ target.primary_description | replace('\n', '\\n') | replace('\r', '') }}",
       },
       {%- endfor %}
     ]
@@ -143,11 +120,10 @@
       grid.innerHTML = "";
 
       const sampledTargets = sample(targetList, 16);
-      console.log('Line 146')
       for (target of sampledTargets) {
-        const textElement = document.createElement('text');
+        const textElement = document.createElement('div');
         console.log(target['primary_description'])
-        textElement.innerText = target['primary_description'];
+        textElement.innerHTML = target['primary_description'];
         (function(arm_idx) {
           textElement.onclick = function() {
             // console.log(target);

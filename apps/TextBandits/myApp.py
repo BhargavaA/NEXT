@@ -75,10 +75,11 @@ class MyApp:
         init_target = init_arm and self.TargetManager.get_target_item(exp_uid, init_arm)
 
         return_dict = {
-            'target_indices': alg_response,
-            'targets': target,
+            'target_indices': [alg_response],
+            'targets': [target],
             'init_target': init_target,
             'instructions': 'Is this the kind of document you are looking for?',
+            # 'instructions': 'Is this the kind of image you are looking for?',
             'count': 1,
         }
 

@@ -1,5 +1,38 @@
-{%- if query.targets|length == 1 %}
-  {%- include 'single_image.html' %}
-{%- else %}
-  {%- include 'multi_image.html' %}
-{%- endif %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js" integrity="sha256-tQ3x4V2JW+L0ew/P3v2xzL46XDjEWUExFkCDY0Rflqc=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" integrity="sha256-uKEg9s9/RiqVVOIWQ8vq0IIqdJTdnxDMok9XhiqnApU=" crossorigin="anonymous" />
+
+<style>
+  p.comparison {
+    border: 1px solid grey;
+
+    padding: 4px;
+  }
+
+  .answers {
+    padding-top: 5em;
+  }
+</style>
+
+<p class="comparison">{{query.targets[0].primary_description|e}}</p>
+
+<label for="keywords">Keywords</label>
+<input id="keywords" type="text" class="form-control" data-role="tagsinput" />
+
+<div class="answers row">
+  <div class="col-md-6">
+    <div class="btn btn-default btn-block" onclick="submit(1)">Yes</div>
+  </div>
+  <div class="col-md-6">
+    <div class="col btn btn-default btn-block" onclick="submit(-1)">No</div>
+  </div>
+</div>
+
+
+<script>
+  function submit(reward) {
+    const relevant_words = $('#keywords').tagsinput('items');
+    console.log(relevant_words);
+    next_widget.processAnswer({"target_rewards": [reward],
+                               "relevant_words": relevant_words});
+  }
+</script>

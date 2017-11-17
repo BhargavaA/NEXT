@@ -41,6 +41,8 @@ processAnswer:
 
       revealed_indices:
         type: list
+        values:
+          type: num
 
     rets:
       type: bool

@@ -42,11 +42,10 @@ def launch(targets_filename=None, upload=False):
     d = target_dictionary['matrix']['shape'][1]
     print('n = %d' % n)
     print('d = %d' % d)
-    for key in keys:
-        targetset.append({'target_id': target_dictionary['index_text'][key]['index'],
+    for idx, key in enumerate(keys):
+        targetset.append({'target_id': idx,
                           'primary_type': 'text',
-                          # 'primary_description': '{}'.format(unicodedata.normalize('NFKD', target_dictionary['index_text'][key]['text']).encode('utf8','ignore')),
-                          'primary_description': 'text',
+                          'primary_description': unicodedata.normalize('NFKD', target_dictionary['index_text'][key]['text']),
                           'alt_type': 'text',
                           'alt_description': 'Document {}'.format(key)})
 
