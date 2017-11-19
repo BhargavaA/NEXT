@@ -48,4 +48,6 @@ processAnswer:
           type: list
           values:
             type: num
-
+        relevant_words:
+          type: any
+          optional: true

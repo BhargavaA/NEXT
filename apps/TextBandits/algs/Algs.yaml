@@ -39,10 +39,8 @@ processAnswer:
       participant_uid:
         type: str
 
-      revealed_indices:
-        type: list
-        values:
-          type: num
+      relevant_words:
+        type: any
 
     rets:
       type: bool

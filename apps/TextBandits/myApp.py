@@ -107,9 +107,8 @@ class MyApp:
         #         {'exp_uid': butler.exp_uid, 'args': {'alg_label': query['alg_label'], 'logging': True}}))
 
         for target, reward in zip(targets, rewards):
-            revealed_indices = [0]
             alg({'arm_id': target, 'reward': reward, 'num_responses': num_responses, 'init_id': init_arm,
-                 'participant_uid': participant_uid, 'revealed_indices': revealed_indices})
+                 'participant_uid': participant_uid, 'relevant_words': args['relevant_words']})
 
         return {'target_ids': targets, 'target_rewards': rewards}
 
