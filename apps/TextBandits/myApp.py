@@ -23,7 +23,7 @@ class MyApp:
             cols = args['matrix']['cols']
             data = args['matrix']['data']
             shape = args['matrix']['shape']
-            features = sparse.coo_matrix((data, (rows, cols)), shape=(shape[0], shape[1])).tocsr()
+            features = (sparse.coo_matrix((data, (rows, cols)), shape=(shape[0], shape[1]))).todense()
 
             word_to_index_dict = args['name_to_index_dict']
             butler.experiment.set(key='word_to_index_dict', value=word_to_index_dict)
@@ -97,7 +97,7 @@ class MyApp:
         relevant_words = args['relevant_words']
         relevant_indices = []
         for word in relevant_words:
-            relevant_indices.append(word_to_index_dict[word])
+            relevant_indices.append(word_to_index_dict[word.lower()])
 
         # experiment = butler.experiment.get()
         num_responses = butler.participants.get(uid=participant_uid, key='num_responses')

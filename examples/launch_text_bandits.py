@@ -51,7 +51,7 @@ def launch(targets_filename=None, upload=False):
 
     # pprint(targetset)
 
-    supported_alg_ids = ['RandomSampling']
+    supported_alg_ids = ['FFOFUL']
 
     alg_list = []
     for alg_id in supported_alg_ids:
@@ -64,7 +64,7 @@ def launch(targets_filename=None, upload=False):
                 'epsilon': 0.1,
                 'ridge': 1.0
             }
-        elif alg_id == 'OFUL':
+        elif alg_id == 'FFOFUL':
             alg_item['params'] = {
                 'ridge': 1.0,
                 'R': 1.0,

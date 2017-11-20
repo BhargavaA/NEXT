@@ -3,6 +3,8 @@ from numpy.random import shuffle
 import numpy as np
 import next.utils as utils
 from numpy.linalg import inv
+from scipy import sparse
+
 
 
 class MyAlg:
@@ -28,18 +30,16 @@ class MyAlg:
         arm_order = butler.participants.get(uid=participant_uid, key='arm_order')
         do_not_ask = butler.participants.get(uid=participant_uid, key='do_not_ask')
 
-        num_return = 16
-        counter = 0
-        return_arms = []
-        for next_arm in arm_order:
-            if next_arm not in do_not_ask and next_arm not in return_arms:
-                counter += 1
-                return_arms.append(next_arm)
-                if counter >= num_return:
-                    break
+        if arm_order is None:
+            n = butler.algorithms.get(key='n')
+            arm_order = range(n)
+            shuffle(arm_order)
 
-        # butler.participants.append(uid=participant_uid, key='do_not_ask', value=next_arm)
-        return return_arms
+        for next_arm in arm_order:
+            if next_arm not in do_not_ask:
+                break
+
+        return next_arm
 
     def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid, relevant_indices):
         if num_responses == 1:
@@ -59,11 +59,30 @@ class MyAlg:
             butler.participants.set(uid=participant_uid, key='revealed_indices', value=revealed_indices)
 
             self.update_parameters(butler, participant_uid, revealed_indices)
+        # utils.debug_print('rel_inds: ', relevant_indices)
+        revealed_indices = butler.participants.get(uid=participant_uid, key='revealed_indices')
+        if revealed_indices is None:
+            prev_d = 1
+        else:
+            prev_d = len(revealed_indices)
 
-        revealed_indices = butler.participants.get(key='revealed_indices')
-        prev_d = len(revealed_indices)
-        revealed_indices = list(set().union(revealed_indices, relevant_indices))
-        new_d = len(revealed_indices)
+        # utils.debug_print('69, ris: ', revealed_indices)
+        if revealed_indices is None:
+            if relevant_indices == []:
+                revealed_indices = []
+            else:
+                revealed_indices = relevant_indices
+            # utils.debug_print('75, ris: ', revealed_indices)
+        else:
+            revealed_indices = list(set().union(revealed_indices, relevant_indices))
+            # utils.debug_print('78, ris: ', revealed_indices)
+        if revealed_indices is None:
+            new_d = 1
+        else:
+            new_d = len(revealed_indices)
+
+        if new_d == 0:
+            new_d = 0.1
 
         butler.participants.append(uid=participant_uid, key='do_not_ask', value=arm_id)
 
@@ -111,6 +130,8 @@ class MyAlg:
         ridge = butler.algorithms.get(key='ridge')
         t = butler.participants.get(uid=participant_uid, key='num_reported_answers')
 
+        # utils.debug_print('new_d:', new_d)
+
         if new_d == prev_d:
             invVt = np.array(butler.participants.get(uid=participant_uid, key='invVt'))
             b = np.array(butler.participants.get(uid=participant_uid, key='b'))
@@ -148,7 +169,7 @@ class MyAlg:
 
     def update_parameters(self, butler, participant_uid, revealed_indices):
         if len(revealed_indices) == 0:
-            n = butler.experiment.get(key='n')
+            n = butler.algorithms.get(key='n')
             arm_order = range(n)
             shuffle(arm_order)
             invVt = 1.0
@@ -158,7 +179,15 @@ class MyAlg:
         else:
             new_d = len(revealed_indices)
             features = np.load('features.npy')
-            small_features = features[:, revealed_indices].toarray()
+            # utils.debug_print('type of mat: ', type(features))
+            # utils.debug_print('feats:', features)
+            # utils.debug_print('shape of mat: ', len(features))
+            # utils.debug_print('ris: ', revealed_indices)
+
+            if new_d == 1:
+                small_features = features[:, revealed_indices]
+            else:
+                small_features = features[:, revealed_indices]
             rewards = butler.participants.get(uid=participant_uid, key='received_rewards')
             arms = butler.participants.get(uid=participant_uid, key='arms_pulled')
             ridge = butler.algorithms.get(key='ridge')
