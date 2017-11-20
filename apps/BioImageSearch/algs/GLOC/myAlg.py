@@ -23,8 +23,8 @@ class MyAlg:
         butler.algorithms.set(key='kappa', value=kappa)
         butler.algorithms.set(key='delta', value=failure_probability)
 
-        if butler.dashboard.get(key='plot_data') is None:
-            butler.dashboard.set(key='plot_data', value=[])
+        if butler.experiment.get(key='plot_data') is None:
+            butler.experiment.set(key='plot_data', value=[])
 
         return True
 
@@ -79,11 +79,11 @@ class MyAlg:
                             'participant_uid': participant_uid,
                             'initial_arm': init_id,
                             'arm_pulled': arm_id,
-                            'alg': 'TS',
+                            'alg': 'GLOC',
                             'time': num_responses
                             }
 
-        butler.dashboard.append(key='plot_data', value=update_plot_data)
+        butler.experiment.append(key='plot_data', value=update_plot_data)
 
         task_args = {
             'arm_id': arm_id,

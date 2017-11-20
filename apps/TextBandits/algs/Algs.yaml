@@ -39,7 +39,7 @@ processAnswer:
       participant_uid:
         type: str
 
-      relevant_words:
+      relevant_indices:
         type: any
 
     rets:

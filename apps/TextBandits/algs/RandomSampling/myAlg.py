@@ -30,8 +30,8 @@ class MyAlg:
 
     return next_arm
 
-  def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid, relevant_words):
-    utils.debug_print(relevant_words)
+  def processAnswer(self, butler, arm_id, reward, num_responses, init_id, participant_uid, relevant_indices):
+    utils.debug_print('ris:', relevant_indices)
     if num_responses == 1:
         butler.participants.set(uid=participant_uid, key='received_rewards', value=[])
     butler.participants.append(key='received_rewards', value=reward)

@@ -47,11 +47,11 @@ class MyAlg:
                         'participant_uid': participant_uid,
                         'initial_arm': init_id,
                         'arm_pulled': arm_id,
-                        'alg': 'TS',
+                        'alg': 'Random',
                         'time': num_responses
                         }
 
-    butler.dashboard.append(key='plot_data', value=update_plot_data)
+    butler.experiment.append(key='plot_data', value=update_plot_data)
 
     return True
 

@@ -93,6 +93,11 @@ class MyApp:
         rewards = args['target_rewards']
         butler.participants.increment(uid=participant_uid, key='num_responses')
         # print(targets, rewards)
+        word_to_index_dict = butler.experiment.get(key='word_to_index_dict')
+        relevant_words = args['relevant_words']
+        relevant_indices = []
+        for word in relevant_words:
+            relevant_indices.append(word_to_index_dict[word])
 
         # experiment = butler.experiment.get()
         num_responses = butler.participants.get(uid=participant_uid, key='num_responses')
@@ -108,7 +113,7 @@ class MyApp:
 
         for target, reward in zip(targets, rewards):
             alg({'arm_id': target, 'reward': reward, 'num_responses': num_responses, 'init_id': init_arm,
-                 'participant_uid': participant_uid, 'relevant_words': args['relevant_words']})
+                 'participant_uid': participant_uid, 'relevant_indices': relevant_indices})
 
         return {'target_ids': targets, 'target_rewards': rewards}
 
